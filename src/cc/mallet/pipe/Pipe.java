@@ -81,7 +81,7 @@ public abstract class Pipe implements Serializable, AlphabetCarrying
 	boolean targetAlphabetResolved = false;
 	boolean targetProcessing = true;
 
-	VMID instanceId = new VMID();  //used in readResolve to distinguish persistent instances
+	VMID instanceId = new VMID();  //used in (removed) readResolve to distinguish persistent instances
 
 	/** Construct a pipe with no data and target dictionaries
 	 */
@@ -323,33 +323,5 @@ public abstract class Pipe implements Serializable, AlphabetCarrying
 		targetAlphabetResolved = in.readBoolean();
 		targetProcessing = in.readBoolean();
 		instanceId = (VMID) in.readObject();
-	}
-
-	private transient static ConcurrentMap<VMID, Object> deserializedEntries = new ConcurrentHashMap<VMID, Object>();
-	
-	/**
-	 * This gets called after readObject; it lets the object decide whether
-	 * to return itself or return a previously read in version.
-	 * We use a hashMap of instanceIds to determine if we have already read
-	 * in this object.
-	 * @return
-	 * @throws ObjectStreamException
-	 */
-
-	public Object readResolve() throws ObjectStreamException {
-		//System.out.println(" *** Pipe ReadResolve: instance id= " + instanceId);
-		Object previous = deserializedEntries.get(instanceId);
-		if (previous != null){
-			//System.out.println(" *** Pipe ReadResolve:Resolving to previous instance. instance id= " + instanceId);
-			return previous;
-		}
-		if (instanceId != null){
-            Object prev = deserializedEntries.putIfAbsent(instanceId, this);
-            if (prev != null) {
-                return prev;
-            }
-        }
-		//System.out.println(" *** Pipe ReadResolve: new instance. instance id= " + instanceId);
-		return this;
 	}
 }

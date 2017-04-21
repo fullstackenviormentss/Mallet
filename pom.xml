@@ -3,7 +3,7 @@
 
   <groupId>cc.mallet</groupId>
   <artifactId>mallet</artifactId>
-  <version>2.0.8</version>
+  <version>2.0.8-copilot</version>
   <packaging>jar</packaging>
   <name>MAchine Learning for LanguagE Toolkit (MALLET)</name>
   <description>
@@ -37,8 +37,8 @@
     </developer>
   </developers>
   <properties>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

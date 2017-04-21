@@ -54,7 +54,7 @@ public class Alphabet implements Serializable
 	ArrayList entries;
 	volatile boolean growthStopped = false;
 	Class entryClass = null;
-	VMID instanceId = new VMID();  //used in readResolve to identify persitent instances
+	VMID instanceId = new VMID();  //used in (removed) readResolve to identify persitent instances
 
     private transient ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -369,29 +369,4 @@ public class Alphabet implements Serializable
     }
 
 	private transient static ConcurrentMap<VMID,Object> deserializedEntries = new ConcurrentHashMap<VMID,Object>();
-
-	/**
-	 * This gets called after readObject; it lets the object decide whether
-	 * to return itself or return a previously read in version.
-	 * We use a hashMap of instanceIds to determine if we have already read
-	 * in this object.
-	 * @return
-	 * @throws ObjectStreamException
-	 */
-
-	public Object readResolve() throws ObjectStreamException {
-		Object previous = deserializedEntries.get(instanceId);
-		if (previous != null){
-			//System.out.println(" ***Alphabet ReadResolve:Resolving to previous instance. instance id= " + instanceId);
-			return previous;
-		}
-		if (instanceId != null){
-            Object prev = deserializedEntries.putIfAbsent(instanceId, this);
-            if (prev != null) {
-                return prev;
-            }
-        }
-		//System.out.println(" *** Alphabet ReadResolve: new instance. instance id= " + instanceId);
-		return this;
-	}
 }
