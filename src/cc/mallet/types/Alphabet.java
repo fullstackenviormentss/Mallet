@@ -67,7 +67,12 @@ public class Alphabet implements Serializable
 		deserializedEntries.putIfAbsent(instanceId, this);
 	}
 
-	public Alphabet (Class entryClass)
+	//Hack to prevent growth of models during prediction. See CF-469
+    public void setGrowthStopped() {
+        this.growthStopped = true;
+    }
+
+    public Alphabet (Class entryClass)
 	{
 		this (8, entryClass);
 	}
