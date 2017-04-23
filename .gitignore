@@ -9,4 +9,4 @@ dist/mallet.jar
 *.dot
 .idea
 *.class
-mallet.iml
+*.iml
