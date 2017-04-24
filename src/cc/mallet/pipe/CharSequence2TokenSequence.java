@@ -16,41 +16,40 @@ package cc.mallet.pipe;
 
 
 import java.io.*;
-import java.net.URI;
 import java.util.regex.Pattern;
 
 import cc.mallet.extract.StringSpan;
 import cc.mallet.extract.StringTokenization;
 import cc.mallet.types.Instance;
 import cc.mallet.types.SingleInstanceIterator;
-import cc.mallet.types.Token;
 import cc.mallet.types.TokenSequence;
 import cc.mallet.util.CharSequenceLexer;
-import cc.mallet.util.Lexer;
 
 /**
  *  Pipe that tokenizes a character sequence.  Expects a CharSequence
  *   in the Instance data, and converts the sequence into a token
  *   sequence using the given regex or CharSequenceLexer.  
- *   (The regex / lexer should specify what counts as a token.)
+ *   (The regex / lexerTemplate should specify what counts as a token.)
  */
 public class CharSequence2TokenSequence extends Pipe implements Serializable
 {
-	CharSequenceLexer lexer;
-	
-	public CharSequence2TokenSequence (CharSequenceLexer lexer)
+	//DO NOT USE..template only. It's state aware and so useless for parallelization/
+	//Hopefully nobody extends CharSequenceLexer and passes it in
+	private CharSequenceLexer lexerTemplate;
+
+	public CharSequence2TokenSequence (CharSequenceLexer lexerTemplate)
 	{
-		this.lexer = lexer;
+		this.lexerTemplate = lexerTemplate;
 	}
 
 	public CharSequence2TokenSequence (String regex)
 	{
-		this.lexer = new CharSequenceLexer (regex);
+		this.lexerTemplate = new CharSequenceLexer (regex);
 	}
 
 	public CharSequence2TokenSequence (Pattern regex)
 	{
-		this.lexer = new CharSequenceLexer (regex);
+		this.lexerTemplate = new CharSequenceLexer (regex);
 	}
 
 	public CharSequence2TokenSequence ()
@@ -60,6 +59,8 @@ public class CharSequence2TokenSequence extends Pipe implements Serializable
 
 	public Instance pipe (Instance carrier)
 	{
+		CharSequenceLexer lexer = new CharSequenceLexer(this.lexerTemplate.getPattern());
+
 		CharSequence string = (CharSequence) carrier.getData();
 		lexer.setCharSequence (string);
 		TokenSequence ts = new StringTokenization (string);
@@ -98,14 +99,11 @@ public class CharSequence2TokenSequence extends Pipe implements Serializable
 	
 	private void writeObject (ObjectOutputStream out) throws IOException {
 		out.writeInt(CURRENT_SERIAL_VERSION);
-		out.writeObject(lexer);
+		out.writeObject(lexerTemplate);
 	}
 	
 	private void readObject (ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int version = in.readInt ();
-		lexer = (CharSequenceLexer) in.readObject();
+		lexerTemplate = (CharSequenceLexer) in.readObject();
 	}
-
-
-	
 }
